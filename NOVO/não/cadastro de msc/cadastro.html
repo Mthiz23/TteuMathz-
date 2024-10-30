@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <header>
+        <div class="container">
+            <img src="imagem.png" alt="Strayth" height="10%" width="10%">
+            <nav>
+                <ul>
+                    <li><a href="../principal/principal.html">PLAYLISTS</a></li>
+                    <li><a href="../playlist/playlist.html">EM ALTA</a></li>
+                    <li><a href="../inicial/emAlta.html">PÁGINA INICIAL</a></li>
+                    <li><a href="../cadastro de msc/cadastro.html">CADASTRO DE MÚSICA</a></li>
+                </ul>
+            </nav>
+            <div class="search">
+                <input type="text" placeholder="PESQUISE">
+            </div>
+            <div class="user">
+                <img src="user.jpg" alt="Foto de Perfil">
+            </div>
+        </div>
+    </header>
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./cadastro.css">
+    <title>Cadastro de Músicas</title>
+    <script>
+        function cadastrarMusica() {
+            const titulo = document.getElementById('title').value;
+            const artista = document.getElementById('artist').value;
+            const genero = document.getElementById('genre').value;
+            const duracao = document.getElementById('duration').value;
+            const link = document.getElementById('link').value;
+
+            const musicList = document.getElementById('musicList');
+            const musicItem = document.createElement('li');
+            
+            // Cria um iframe para o vídeo do YouTube
+            const videoEmbed = `<iframe width="200" height="100" src="${link.replace('watch?v=', 'embed/')}" frameborder="0" allowfullscreen></iframe>`;
+            musicItem.innerHTML = `${titulo} - ${artista} (${genero}, ${duracao} min) ${videoEmbed}`;
+            musicList.appendChild(musicItem);
+
+            // Limpa o formulário após o cadastro
+            document.getElementById('musicForm').reset();
+        }
+    </script>
+</head>
+<body>
+    <h1>Cadastro de Músicas</h1>
+    <form id="musicForm" onsubmit="event.preventDefault(); cadastrarMusica();">
+        <input type="text" id="title" placeholder="Título" required>
+        <input type="text" id="artist" placeholder="Artista" required>
+        <input type="text" id="genre" placeholder="Gênero" required>
+        <input type="number" id="duration" placeholder="Duração (min)" required>
+        <body>
+            <div id="musicContainer">
+                <input type="text" id="musicLink" placeholder="Link do Mp3" />
+                <button id="addButton">Adicionar Música</button>
+                <h2>Músicas Cadastradas</h2>
+                <ul id="playlist"></ul>
+        
+                <div id="musicPlayer"></div>
+                <button id="nextButton" style="display:none;">Próxima Música</button>
+            </div>
+            <script>
+                const playlist = [];
+                let currentSongIndex = -1;
+                const musicPlayer = document.getElementById('musicPlayer');
+                const musicImage = document.getElementById('musicImage');
+                
+                document.getElementById('addButton').addEventListener('click', function() {
+                    const link = document.getElementById('musicLink').value;
+                    if (link) {
+                        playlist.push(link);
+                        updatePlaylistDisplay();
+                        document.getElementById('musicLink').value = ''; // Limpa o campo
+                    }
+                });
+        
+                document.getElementById('nextButton').addEventListener('click', playNextSong);
+        
+                function updatePlaylistDisplay() {
+                    const playlistElement = document.getElementById('playlist');
+                    playlistElement.innerHTML = '';
+                    playlist.forEach((song, index) => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Música ${index + 1}`;
+                        const playButton = document.createElement('button');
+                        playButton.textContent = 'Tocar';
+                        playButton.addEventListener('click', () => playSong(index));
+                        listItem.appendChild(playButton);
+                        playlistElement.appendChild(listItem);
+                    });
+                }
+        
+                function playSong(index) {
+                    currentSongIndex = index;
+                    const link = playlist[index];
+                    musicPlayer.innerHTML = '';
+        
+                    const audio = document.createElement('audio');
+                    audio.controls = true;
+                    audio.autoplay = true;
+        
+                    const source = document.createElement('source');
+                    source.src = link;
+                    source.type = 'audio/mpeg';
+                    audio.appendChild(source);
+                    musicPlayer.appendChild(audio);
+        
+                    audio.onended = playNextSong; // Toca a próxima música automaticamente
+                    document.getElementById('nextButton').style.display = 'inline'; // Exibe o botão "Próxima Música"
+                }
+        
+                function playNextSong() {
+                    if (currentSongIndex < playlist.length - 1) {
+                        playSong(currentSongIndex + 1);
+                    } else {
+                        currentSongIndex = -1; // Reseta para o início
+                        musicPlayer.innerHTML = ''; // Limpa o reprodutor
+                        musicImage.style.display = 'none'; // Esconde a imagem
+                        document.getElementById('nextButton').style.display = 'none'; // Esconde o botão
+                    }
+                }
+            </script>
+        </body>
+    </form>
+
+    
+</body>
+</html>
